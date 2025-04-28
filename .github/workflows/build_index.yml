@@ -1,0 +1,25 @@
+name: Fetch DHQ-Data and build the index
+
+on:
+  workflow_dispatch:
+
+jobs:
+  # Single deploy job since we're just deploying
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TYPESENSE_HOST: typesense.acdh-dev.oeaw.ac.at
+      TYPESENSE_PORT: 443
+      TYPESENSE_PROTOCOL: https
+      TYPESENSE_API_KEY: ${{secrets.TYPESENSE_API_KEY}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Fetch the data
+        run: ./fetch_data.sh
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Set up Python
+        run: uv python install
+      - name: Build the Index
+        run: uv run main.py
